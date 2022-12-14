@@ -124,7 +124,7 @@ local function get_headers(bufnr, start_line, end_line)
     local header_name, header_value = line_content:match("^(.-): ?(.*)$")
 
     if not utils.contains_comments(header_name) then
-      headers[header_name] = utils.replace_vars(header_value)
+      headers[header_name:lower()] = utils.replace_vars(header_value)
     end
     ::continue::
   end
@@ -145,7 +145,7 @@ local function get_curl_args(bufnr, headers_end, end_line)
 
     if line_content:find("^ *%-%-?[a-zA-Z%-]+") then
       local lc = vim.split(line_content, " ")
-      local x  = ""
+      local x = ""
 
       for i, y in ipairs(lc) do
         x = x .. y
