@@ -328,16 +328,6 @@ end
 -- @return str
 M.format_body = function(str, content_type)
   local result = str
-  vim.api.nvim_echo({
-    {
-      string.format(
-        "Running formatter %s on response body:\n%s",
-        vim.inspect(content_type),
-        result
-      ),
-      "Error",
-    },
-  }, false, {})
   local formatter = config.get("result").formatters[content_type]
   -- formate response body
   if type(formatter) == "function" then
@@ -371,16 +361,6 @@ M.format_body = function(str, content_type)
       }, false, {})
     end
   end
-  vim.api.nvim_echo({
-    {
-      string.format(
-        "Error running formatter %s on response body:\n%s",
-        vim.inspect(formatter),
-        result
-      ),
-      "Error",
-    },
-  }, false, {})
   return result
 end
 
