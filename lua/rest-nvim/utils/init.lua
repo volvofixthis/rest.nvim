@@ -312,6 +312,58 @@ M.contains_comments = function(str)
   return str:find("^#") or str:find("^%s+#")
 end
 
+local function is_executable(x)
+  if type(x) == "string" and vim.fn.executable(x) == 1 then
+    return true
+  elseif vim.tbl_islist(x) and vim.fn.executable(x[1] or "") == 1 then
+    return true
+  end
+
+  return false
+end
+
+-- format_json formats json
+-- @param str The string that should be formatted
+-- @param content_type Type of body
+-- @return str
+M.format_body = function(str, content_type)
+  local result = str
+  local formatter = config.get("result").formatters[content_type]
+  -- formate response body
+  if type(formatter) == "function" then
+    local ok, out = pcall(formatter, result)
+    -- check if formatter ran successfully
+    if ok and out then
+      result = out
+    else
+      vim.api.nvim_echo({
+        {
+          string.format("Error calling formatter on response body:\n%s", out),
+          "Error",
+        },
+      }, false, {})
+    end
+  elseif is_executable(formatter) then
+    local stdout = vim.fn.system(formatter, result):gsub("\n$", "")
+    -- check if formatter ran successfully
+    if vim.v.shell_error == 0 then
+      result = stdout
+    else
+      vim.api.nvim_echo({
+        {
+          string.format(
+            "Error running formatter %s on response body:\n%s",
+            vim.inspect(formatter),
+            stdout
+          ),
+          "Error",
+        },
+      }, false, {})
+    end
+  end
+  return result
+end
+
 -- http_status returns the status code and the meaning, e.g. 200 OK
 -- see https://httpstatuses.com/ for reference
 -- @param code The request status code
