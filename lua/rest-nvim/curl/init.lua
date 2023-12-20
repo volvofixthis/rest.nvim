@@ -53,7 +53,8 @@ local function create_callback(method, url)
     -- get content type
     for _, header in ipairs(res.headers) do
       if string.lower(header):find("^content%-type") then
-        content_type = header:match("application/(%l+)") or header:match("text/(%l+)")
+        content_type = header:match("application/(%l+).*") or header:match("text/(%l+).*")
+        print(content_type)
         break
       end
     end
@@ -90,7 +91,7 @@ local function create_callback(method, url)
     end
 
     --- Add the curl command results into the created buffer
-    res.body = utils.format_body(res.body, config.get("result").formatters[content_type])
+    res.body = utils.format_body(res.body, content_type)
 
     -- append response container
     res.body = "#+RESPONSE\n" .. res.body .. "\n#+END"
