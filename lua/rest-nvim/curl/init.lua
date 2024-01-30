@@ -54,7 +54,6 @@ local function create_callback(method, url)
     for _, header in ipairs(res.headers) do
       if string.lower(header):find("^content%-type") then
         content_type = header:match("application/(%l+).*") or header:match("text/(%l+).*")
-        print(content_type)
         break
       end
     end
